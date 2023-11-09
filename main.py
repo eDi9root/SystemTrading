@@ -2,9 +2,9 @@
 from api.Kiwoom import *
 import sys
 
-app = QAppilication(sys.argv)
+app = QApplication(sys.argv)
 kiwoom = Kiwoom()
-#kiwoom.get_account_number()
+kiwoom.get_account_number()
 app.exec_()
 # Auto login
 

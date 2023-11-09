@@ -28,10 +28,11 @@ class Kiwoom(QAxWidget):
         else:
             print("JS NOT connected")
         # Refer from KOA
-        self.login_evel_loop.exit() # Exit response loop
+        self.login_event_loop.exit() # Exit response loop
 
     def _comm_connect(self):  # Login Function 
         self.dynamicCall("CommConnect()")
+
         self.login_event_loop = QEventLoop()  # Begin waiting response for trying login
         self.login_event_loop.exec_()
 
