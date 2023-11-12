@@ -41,7 +41,6 @@ class Kiwoom(QAxWidget):
         account_number = account_list.split(';')[0] # Environment for simulate
         print(account_number)
         return account_number
-
     """ 
     "ACCOUNT_CNT" : Number of own accounts
     "ACCLIST" or "ACCNO" : List of accounts with ';'
@@ -56,7 +55,6 @@ class Kiwoom(QAxWidget):
         code_list = self.dynamicCall("GetCodeListByMarket(QString)", market_type)
         code_list = code_list.split(';')[:-1]
         return code_list
-
     '''
     Get List by Market
     KOA Developing Guide -> other functions -> Functions related to Stock information
@@ -76,3 +74,15 @@ class Kiwoom(QAxWidget):
     def get_master_code_name(self, code): # Function for return name from code
         code_name = self.dynamicCall("GetMasterCodeName(QString)", code)
         return code_name
+
+
+    self.dynamicCall("CommRqData(QString, QString, int, QString)", "opt10081_req", "opt10081", 0, "0001")
+    # Function CommRqData -> return 0 is normal, rest is an error
+    """
+    Get Price Information
+    일봉이란 1일 거래 동안의 주가 변동을 캔들 차트로 표현한 것
+    당일 장 마감때 가격(종가)이 시작 가격(시가)보다 상승하면 양봉, 반대면 음봉이라 한다
+    양봉은 빨간색, 음봉은 파란색
+    가격 정보란 '시가, 저가, 종가, 고가'를 의미한다
+    """
+
