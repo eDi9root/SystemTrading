@@ -109,7 +109,7 @@ class Kiwoom(QAxWidget):
 
         self.tr_event_loop.exit()
         time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
-a
+
 
 
 
