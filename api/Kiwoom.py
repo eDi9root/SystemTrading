@@ -2,6 +2,7 @@ from PyQt5.QAxContainer import *
 from PyQt5.QtCore import QEventLoop
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+import time
 
 
 class Kiwoom(QAxWidget):
@@ -21,6 +22,8 @@ class Kiwoom(QAxWidget):
 
     def _set_signal_slots(self): # Slot function to get a response from API
         self.OnEventConnect.connect(self._login_slot) # Get login response to _login_slot
+
+        self.OnReceiveTrData.connect(self._on_receive_tr_data) # Set getting response result from TR
 
     def _login_slot(self, err_code): # Get response of trying login
         if err_code == 0:
@@ -74,6 +77,40 @@ class Kiwoom(QAxWidget):
     def get_master_code_name(self, code): # Function for return name from code
         code_name = self.dynamicCall("GetMasterCodeName(QString)", code)
         return code_name
+
+    def _on_receive_tr_data(self, screen_no, rqname, trcode, record_name, next, unused1, unused2, unused3, unused4):
+        print("[Kiwoom] _on_receive_tr_data is called {} / {} / {}".format(screen_no, rqname, trcode)) # Print what response of TR
+        tr_data_cnt = self.dynamicCall("GetRepeatCnt(QString, QString)", trcode, rqname) # Get number of response of this request
+
+        if next == '2':
+            self.has_next_tr_data = True
+        else:
+            self.has_next_tr_data = False
+
+        if rqname == "opt10081_req":
+            oh1cv = {'data': [], 'open': [], 'high': [], 'low': [], 'close': [], 'volume': []}
+
+            for i in range(tr_data_cnt):
+                date = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "일자")
+                open = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "시가")
+                high = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "고가")
+                low = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "저가")
+                close = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "현재가")
+                volume = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "거래량")
+
+                oh1cv['data'].append(data.strip())
+                oh1cv['open'].append(int(open))
+                oh1cv['high'].append(int(high))
+                oh1cv['low'].append(int(low))
+                oh1cv['close'].append(int(close))
+                oh1cv['volume'].append(int(volume))
+
+            self.tr_data = oh1cv
+
+        self.tr_event_loop.exit()
+        time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
+
+
 
 
     self.dynamicCall("CommRqData(QString, QString, int, QString)", "opt10081_req", "opt10081", 0, "0001")
