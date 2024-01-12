@@ -1,6 +1,1 @@
-# SystemTrading
-# This
-# is
-# my
-# system
-# Trading practice
+#Python_project_SystemTrading with Bank API
