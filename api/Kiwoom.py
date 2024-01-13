@@ -3,6 +3,7 @@ from PyQt5.QtCore import QEventLoop
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import time
+import pandas as pd
 
 
 class Kiwoom(QAxWidget):
@@ -15,6 +16,9 @@ class Kiwoom(QAxWidget):
 
         self.account_number = self.get_account_number()
         # Automatically call once when initialize
+
+        self.tr_event_loop = QEventLoop()
+        # Variable, waiting for response to TR request
 
     def _make_kiwoom_instance(self):
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
@@ -78,9 +82,36 @@ class Kiwoom(QAxWidget):
         code_name = self.dynamicCall("GetMasterCodeName(QString)", code)
         return code_name
 
+
+    def get_price_data(self, code): # Function, retrieves daily information from
+                                    # the stock's listing data to the most recent date
+        self.dynamicCall("SetInputValue(QString, QString)", "종목코드", code)
+        self.dynamicCall("SetInputValue(QString, QString)", "수정주가구분", "1")
+        self.dynamicCall("CommRqData(QString, QString, int, QString)", "opt10081_req", "opt10081", 0, "0001")
+
+        self.tr_event_loop.exec_()
+
+        ohlcv = self.tr_data
+
+        while self.has_next_tr_data:
+            self.dynamicCall("SetInputValue(QString, QString)", "종목코드", code)
+            self.dynamicCall("SetInputValue(QString, QString)", "수정주가구분", "1")
+            self.dynamicCall("CommRqData(QString, QString, int, QString)", "opt10081_req", "opt10081", 2, "0001")
+            self.tr_event_loop.exec_()
+
+            for key, val in self.tr_data.items():
+                ohlcv[key][-1:] = val
+
+        df = pd.DataFrame(ohlcv, columns=['open', 'high', 'low', 'close', 'volume'], index=ohlcv['date'])
+        # Save imported data in Matrix form
+
+        return df[::-1]
+
     def _on_receive_tr_data(self, screen_no, rqname, trcode, record_name, next, unused1, unused2, unused3, unused4):
-        print("[Kiwoom] _on_receive_tr_data is called {} / {} / {}".format(screen_no, rqname, trcode)) # Print what response of TR
-        tr_data_cnt = self.dynamicCall("GetRepeatCnt(QString, QString)", trcode, rqname) # Get number of response of this request
+        # Print what response of TR
+        print("[Kiwoom] _on_receive_tr_data is called {} / {} / {}".format(screen_no, rqname, trcode))
+        # Get number of response of this request
+        tr_data_cnt = self.dynamicCall("GetRepeatCnt(QString, QString)", trcode, rqname)
 
         if next == '2':
             self.has_next_tr_data = True
@@ -88,7 +119,7 @@ class Kiwoom(QAxWidget):
             self.has_next_tr_data = False
 
         if rqname == "opt10081_req":
-            oh1cv = {'data': [], 'open': [], 'high': [], 'low': [], 'close': [], 'volume': []}
+            ohlcv = {'date': [], 'open': [], 'high': [], 'low': [], 'close': [], 'volume': []}
 
             for i in range(tr_data_cnt):
                 date = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "일자")
@@ -98,28 +129,14 @@ class Kiwoom(QAxWidget):
                 close = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "현재가")
                 volume = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "거래량")
 
-                oh1cv['data'].append(data.strip())
-                oh1cv['open'].append(int(open))
-                oh1cv['high'].append(int(high))
-                oh1cv['low'].append(int(low))
-                oh1cv['close'].append(int(close))
-                oh1cv['volume'].append(int(volume))
+                ohlcv['date'].append(date.strip())
+                ohlcv['open'].append(int(open))
+                ohlcv['high'].append(int(high))
+                ohlcv['low'].append(int(low))
+                ohlcv['close'].append(int(close))
+                ohlcv['volume'].append(int(volume))
 
-            self.tr_data = oh1cv
+            self.tr_data = ohlcv
 
         self.tr_event_loop.exit()
         time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
-
-
-
-
-    self.dynamicCall("CommRqData(QString, QString, int, QString)", "opt10081_req", "opt10081", 0, "0001")
-    # Function CommRqData -> return 0 is normal, rest is an error
-    """
-    Get Price Information
-    일봉이란 1일 거래 동안의 주가 변동을 캔들 차트로 표현한 것
-    당일 장 마감때 가격(종가)이 시작 가격(시가)보다 상승하면 양봉, 반대면 음봉이라 한다
-    양봉은 빨간색, 음봉은 파란색
-    가격 정보란 '시가, 저가, 종가, 고가'를 의미한다
-    """
-

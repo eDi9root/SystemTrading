@@ -6,6 +6,10 @@ app = QApplication(sys.argv)
 kiwoom = Kiwoom()
 # kiwoom.get_account_number()
 
+df = kiwoom.get_price_data("005930")
+print(df)
+
+
 Kospi_code_list = kiwoom.get_code_list_by_market("0")  # KOSPI number
 print(Kospi_code_list)
 for code in Kospi_code_list:

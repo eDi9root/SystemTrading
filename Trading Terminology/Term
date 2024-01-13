@@ -4,3 +4,18 @@
 # High Price = Highest price
 # Close Price = Last traded price when the stock market closes
 
+# HTS = Home Trading System
+# MTS = Mobile Trading System
+
+      """
+       Get Price Information
+       일봉이란 1일 거래 동안의 주가 변동을 캔들 차트로 표현한 것
+       당일 장 마감때 가격(종가)이 시작 가격(시가)보다 상승하면 양봉, 반대면 음봉이라 한다
+       양봉은 빨간색, 음봉은 파란색
+       가격 정보란 '시가, 저가, 종가, 고가'를 의미한다
+
+       The price information we wanted to retrieve was the daily candle,
+       which was the candle created during the day. Changing the time standard of the data to
+       be imported here to minutes, weeks, or months is called quarterly, weekly, or monthly bars.
+      """
+
