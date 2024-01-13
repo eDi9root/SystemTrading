@@ -6,7 +6,10 @@ app = QApplication(sys.argv)
 kiwoom = Kiwoom()
 # kiwoom.get_account_number()
 
-df = kiwoom.get_price_data("005930")
+deposit = kiwoom.get_deposit()
+
+"""
+df = kiwoom.get_price_data("005930") # SAMSUNG information
 print(df)
 
 
@@ -21,6 +24,7 @@ print(Kosdaq_code_list)
 for code in Kosdaq_code_list:
     code_name = kiwoom.get_master_code_name(code)
     print(code, code_name)
+"""
 
 app.exec_()
 # Auto login

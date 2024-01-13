@@ -138,5 +138,20 @@ class Kiwoom(QAxWidget):
 
             self.tr_data = ohlcv
 
+        elif rqname == "opw00001_req":
+            deposit = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, 0, "주문가능금액")
+            self.tr_data = int(deposit)
+            print(self.tr_data)
+
         self.tr_event_loop.exit()
         time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
+
+    # Get the Cash information you have in the account (investment amount)
+    def get_deposit(self):
+        self.dynamicCall("SetInputValue(QString, QString)", "계좌번호", self.account_number)
+        self.dynamicCall("SetInputValue(QString, QString)", "비밀번호입력매체구분", "00")
+        self.dynamicCall("SetInputValue(QString, QString)", "조회구분", "2")
+        self.dynamicCall("CommRqData(QString, QString, int, QString)", "opw00001_req", "opw00001", 0, "0002")
+
+        self.tr_event_loop.exec_()
+        return self.tr_data
