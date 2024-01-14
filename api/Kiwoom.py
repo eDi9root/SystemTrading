@@ -24,11 +24,11 @@ class Kiwoom(QAxWidget):
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
         # Update API identifier to function to get Open API Control Function
 
-    def _set_signal_slots(self): # Slot function to get a response from API
-        self.OnEventConnect.connect(self._login_slot) # Get login response to _login_slot
-        self.OnReceiveTrData.connect(self._on_receive_tr_data) # Set getting response result from TR
-        self.OnReceiveMsg.connect(self._on_receive_msg) # Set receiving TR message to _on_receive_msg
-        self.OnReceiveChejanData.connect(self._on_chejan_slot) # Set receiving conclusion to _on_chejan_slot
+    def _set_signal_slots(self):  # Slot function to get a response from API
+        self.OnEventConnect.connect(self._login_slot)  # Get login response to _login_slot
+        self.OnReceiveTrData.connect(self._on_receive_tr_data)  # Set getting response result from TR
+        self.OnReceiveMsg.connect(self._on_receive_msg)  # Set receiving TR message to _on_receive_msg
+        self.OnReceiveChejanData.connect(self._on_chejan_slot)  # Set receiving conclusion to _on_chejan_slot
 
     def _login_slot(self, err_code): # Get response of trying login
         if err_code == 0:
@@ -176,3 +176,9 @@ class Kiwoom(QAxWidget):
     order_classification = 00: Limit order, 03: Market order (only these two can be used in stock market simulator)
     
     '''
+
+    def _on_receive_msg(self, screen_no, rqname, trcode, msg):
+        print("[Kiwoom] _on_receive_msg is called {} / {}/ {}/ {}".format(screen_no, rqname, trcode, msg))
+
+    def _on_chejan_slot(self, s_gubun, n_item_cnt, s_fid_list):
+        print("[Kiwoom] _on_chejan_slot is called {} / {} / {}".format(s_gubun, n_item_cnt, s_fid_list))
