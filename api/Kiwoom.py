@@ -26,8 +26,9 @@ class Kiwoom(QAxWidget):
 
     def _set_signal_slots(self): # Slot function to get a response from API
         self.OnEventConnect.connect(self._login_slot) # Get login response to _login_slot
-
         self.OnReceiveTrData.connect(self._on_receive_tr_data) # Set getting response result from TR
+        self.OnReceiveMsg.connect(self._on_receive_msg) # Set receiving TR message to _on_receive_msg
+        self.OnReceiveChejanData.connect(self._on_chejan_slot) # Set receiving conclusion to _on_chejan_slot
 
     def _login_slot(self, err_code): # Get response of trying login
         if err_code == 0:
