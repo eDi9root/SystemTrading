@@ -6,7 +6,11 @@ app = QApplication(sys.argv)
 kiwoom = Kiwoom()
 # kiwoom.get_account_number()
 
-deposit = kiwoom.get_deposit()
+# deposit = kiwoom.get_deposit()
+
+order_result = kiwoom.send_order('send_buy_order', '1001', 1,
+                                 '007700', 1, 35000, '00')
+print(order_result)
 
 """
 df = kiwoom.get_price_data("005930") # SAMSUNG information

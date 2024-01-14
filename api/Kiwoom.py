@@ -146,7 +146,7 @@ class Kiwoom(QAxWidget):
         self.tr_event_loop.exit()
         time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
 
-    # Get the Cash information you have in the account (investment amount)
+
     def get_deposit(self):
         self.dynamicCall("SetInputValue(QString, QString)", "계좌번호", self.account_number)
         self.dynamicCall("SetInputValue(QString, QString)", "비밀번호입력매체구분", "00")
@@ -155,3 +155,23 @@ class Kiwoom(QAxWidget):
 
         self.tr_event_loop.exec_()
         return self.tr_data
+    # Get the Cash information you have in the account (investment amount)
+
+    def send_order(self, rqname, screen_no, order_type, code, order_quantity, order_price, order_classification,
+                   origin_order_number=""):
+        order_result = self.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                                        [rqname, screen_no, self.account_number, order_type, code, order_quantity,
+                                         order_price, order_classification, origin_order_number])
+        return order_result
+
+    '''
+    The order processing flow occurs within a program using the API is as follows
+    1. SendOrder (order Occurrence)
+    2. OnReceiveTrData (After receiving the order, create an order number response)
+    3. OnReceiveMsg (Receive order message)
+        Function for receiving Korean response (optional function)
+    4. OnReceiveChejan (Order reception/conclusion)
+    
+    order_classification = 00: Limit order, 03: Market order (only these two can be used in stock market simulator)
+    
+    '''

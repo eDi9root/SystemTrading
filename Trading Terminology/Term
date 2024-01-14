@@ -19,3 +19,10 @@
        be imported here to minutes, weeks, or months is called quarterly, weekly, or monthly bars.
       """
 
+# Market order = an order requesting immediate trading at the price currently traded
+                 in the market without specifying the desired selling price
+                 It is executed with priority.
+# Limit order = on order requesting with specifying the desired selling price
+
+# Slippage = refers to the difference between the price desired by the ordered and the
+             actual price entered into.
