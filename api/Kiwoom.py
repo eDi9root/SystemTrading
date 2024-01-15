@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import time
 import pandas as pd
+from util.const import *
 
 
 class Kiwoom(QAxWidget):
@@ -19,6 +20,11 @@ class Kiwoom(QAxWidget):
 
         self.tr_event_loop = QEventLoop()
         # Variable, waiting for response to TR request
+
+        self.order = {}
+        # dictionary containing the order information for the item from stock code
+        self.balance = {}
+        # dictionary containing purchase information for the stock from stock code
 
     def _make_kiwoom_instance(self):
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
