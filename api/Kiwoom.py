@@ -198,3 +198,20 @@ class Kiwoom(QAxWidget):
                 if data.isdigit():
                     data = int(data)
                 item_name = FID_CODES[fid]
+
+                print("{}: {}".format(item_name, data))
+                if int(s_gubun) == 0:
+                    if code not in self.order.keys():
+                        self.order[code] = {}
+                    self.order[code].update({item_name: data})
+                elif int(s_gubun) == 1:
+                    if code not in self.balance.keys():
+                        self.balance[code] = {}
+                    self.balance[code].update({item_name: data})
+
+        if int(s_gubun) == 0:
+            print("* 주문 출력(self.order)")
+            print(self.order)
+        elif int(s_gubun) == 1:
+            print("* 잔고 출력(self.balance)")
+            print(self.balance)
