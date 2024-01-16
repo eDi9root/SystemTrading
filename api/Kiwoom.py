@@ -23,6 +23,7 @@ class Kiwoom(QAxWidget):
 
         self.order = {}
         # dictionary containing the order information for the item from stock code
+        # dictionary of dictionary
         self.balance = {}
         # dictionary containing purchase information for the stock from stock code
 
@@ -188,3 +189,12 @@ class Kiwoom(QAxWidget):
 
     def _on_chejan_slot(self, s_gubun, n_item_cnt, s_fid_list):
         print("[Kiwoom] _on_chejan_slot is called {} / {} / {}".format(s_gubun, n_item_cnt, s_fid_list))
+
+        for fid in s_fid_list.split(";"):
+            if fid in FID_CODES:
+                code = self.dynamicCall("GetChejanData(int)", '9001')[1:]
+                data = self.dynamicCall("GetChejanData(int)", fid)
+                data = data.strip().lstrip('+').lstrip('-')
+                if data.isdigit():
+                    data = int(data)
+                item_name = FID_CODES[fid]
