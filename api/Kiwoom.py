@@ -190,26 +190,26 @@ class Kiwoom(QAxWidget):
     def _on_chejan_slot(self, s_gubun, n_item_cnt, s_fid_list):
         print("[Kiwoom] _on_chejan_slot is called {} / {} / {}".format(s_gubun, n_item_cnt, s_fid_list))
 
-        for fid in s_fid_list.split(";"):
+        for fid in s_fid_list.split(";"):  # Get fid from list with ";"
             if fid in FID_CODES:
-                code = self.dynamicCall("GetChejanData(int)", '9001')[1:]
-                data = self.dynamicCall("GetChejanData(int)", fid)
-                data = data.strip().lstrip('+').lstrip('-')
+                code = self.dynamicCall("GetChejanData(int)", '9001')[1:]  # Remove first character from code
+                data = self.dynamicCall("GetChejanData(int)", fid)  # Get data by fid
+                data = data.strip().lstrip('+').lstrip('-')  # Remove plus or minus
                 if data.isdigit():
                     data = int(data)
-                item_name = FID_CODES[fid]
+                item_name = FID_CODES[fid]  # Find the item name according to the fid code
 
-                print("{}: {}".format(item_name, data))
-                if int(s_gubun) == 0:
-                    if code not in self.order.keys():
+                print("{}: {}".format(item_name, data))  # Print data ex)주문 가격:35000
+                if int(s_gubun) == 0:  # Submission/Conclusion (0) -> self.order or Balance transfer -> self.balance
+                    if code not in self.order.keys():  # If there is no code in order yet, create new one
                         self.order[code] = {}
-                    self.order[code].update({item_name: data})
+                    self.order[code].update({item_name: data})  # Save data to order dictionary
                 elif int(s_gubun) == 1:
-                    if code not in self.balance.keys():
+                    if code not in self.balance.keys():  # If there is no code in balance yet, create new one
                         self.balance[code] = {}
-                    self.balance[code].update({item_name: data})
+                    self.balance[code].update({item_name: data})  # Save data to balance dictionary
 
-        if int(s_gubun) == 0:
+        if int(s_gubun) == 0:  # Print result according to s_gubun
             print("* 주문 출력(self.order)")
             print(self.order)
         elif int(s_gubun) == 1:
