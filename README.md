@@ -4,6 +4,7 @@
 
 ### 1. Strategy
 - Counter-trend strategy based on 'RSI'
+
   '''
   RSI = 100 * AU / (AU+AD)
   '''
