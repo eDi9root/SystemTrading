@@ -5,6 +5,11 @@ import sys
 app = QApplication(sys.argv)
 kiwoom = Kiwoom()
 
+'''
+position = kiwoom.get_balance()
+print(position)
+'''
+
 """
 orders = kiwoom.get_order()
 print(orders)

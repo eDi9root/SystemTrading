@@ -202,8 +202,42 @@ class Kiwoom(QAxWidget):
 
             self.tr_data = self.order
 
+        elif rqname == "opw00018_req":
+            for i in range(tr_data_cnt):
+                code = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "종목번호")
+                code_name = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "종목명")
+                quantity = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "보유수량")
+                purchase_price = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "매입가")
+                return_rate = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "수익률(%)")
+                current_price = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "현재가")
+                total_purchase_price = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i,"매입금액")
+                available_quantity = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i,"매매가능수량")
+
+                # Data conversion and processing
+                code = code.strip()[1:]
+                code_name = code_name.strip()
+                quantity = int(quantity)
+                purchase_price = int(purchase_price)
+                return_rate = float(return_rate)
+                current_price = int(current_price)
+                total_purchase_price = int(total_purchase_price)
+                available_quantity = int(available_quantity)
+
+                # Dictionary conversion with code as key value
+                self.balance[code] = {
+                    '종목명': code_name,
+                    '보유수량': quantity,
+                    '매입가': purchase_price,
+                    '수익률': return_rate,
+                    '현재가': current_price,
+                    '매입금액': total_purchase_price,
+                    '매매가능수량': available_quantity
+                }
+
+            self.tr_data = self.balance
+
         self.tr_event_loop.exit()
-        time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
+        time.sleep(0.5)  # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
 
 
     def get_deposit(self):
@@ -288,3 +322,12 @@ class Kiwoom(QAxWidget):
     8. Order information inquiry
     9. confirm order information and do not reorder
     """
+
+    def get_balance(self):
+        self.dynamicCall("SetInputValue(QString, QString)", "계좌번호", self.account_number)
+        self.dynamicCall("SetInputValue(QString, QString)", "비밀번호입력매체구분", "00")
+        self.dynamicCall("SetInputValue(QString, QString)", "조회구분", "1")
+        self.dynamicCall("CommRqData(QString, QString, int, QString)", "opw00018_req", "opw00018", 0, "0002")
+
+        self.tr_event_loop.exec_()
+        return self.tr_data
