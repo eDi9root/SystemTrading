@@ -191,10 +191,10 @@ class Kiwoom(QAxWidget):
         print("[Kiwoom] _on_chejan_slot is called {} / {} / {}".format(s_gubun, n_item_cnt, s_fid_list))
 
         for fid in s_fid_list.split(";"):  # Get fid from list with ";"
-            if fid in FID_CODES:
+            if fid in FID_CODES:  # Confirm the fid codes are in our FID_CODES
                 code = self.dynamicCall("GetChejanData(int)", '9001')[1:]  # Remove first character from code
                 data = self.dynamicCall("GetChejanData(int)", fid)  # Get data by fid
-                data = data.strip().lstrip('+').lstrip('-')  # Remove plus or minus
+                data = data.strip().lstrip('+').lstrip('-')  # Remove plus or minus, lstrip -> left strip
                 if data.isdigit():
                     data = int(data)
                 item_name = FID_CODES[fid]  # Find the item name according to the fid code
