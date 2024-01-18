@@ -151,6 +151,57 @@ class Kiwoom(QAxWidget):
             self.tr_data = int(deposit)
             print(self.tr_data)
 
+        elif rqname == "opt10075_req":
+            for i in range(tr_data_cnt):
+                code = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "종목코드")
+                code_name = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "종목명")
+                order_number = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "주문번호")
+                order_status = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "주문상태")
+                order_quantity = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "주문수량")
+                order_price = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "주문가격")
+                current_price = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "현재가")
+                order_type = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "주문구분")
+                left_quantity = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "미체결수량")
+                executed_quantity = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "체결량")
+                ordered_at = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "시간")
+                fee = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "당일매매수수료")
+                tax = self.dynamicCall("GetCommData(QString, QString, int, QString", trcode, rqname, i, "당일매매세금")
+
+                # Data conversion and processing
+                code = code.strip()
+                code_name = code_name.strip()
+                order_number = str(int(order_number.strip()))
+                order_status = order_status.strip()
+                order_quantity = int(order_quantity.strip())
+                order_price = int(order_price.strip())
+
+                current_price = int(current_price.strip().lstrip('+').lstrip('-'))
+                order_type = order_type.strip().lstrip('+').lstrip('-')  # Remove plus and minus
+                left_quantity = int(left_quantity.strip())
+                executed_quantity = int(executed_quantity.strip())
+                ordered_at = ordered_at.strip()
+                fee = int(fee)
+                tax = int(tax)
+
+                # Dictionary conversion with code as key value
+                self.order[code] = {
+                    '종목코드': code,
+                    '종목명': code_name,
+                    '주문번호': order_number,
+                    '주문상태': order_status,
+                    '주문수량': order_quantity,
+                    '주문가격': order_price,
+                    '현재가': current_price,
+                    '주문구분': order_type,
+                    '미체결수량': left_quantity,
+                    '체결량': executed_quantity,
+                    '주문시간': ordered_at,
+                    '당일매매수수료': fee,
+                    '당일매매세금': tax
+                }
+
+            self.tr_data = self.order
+
         self.tr_event_loop.exit()
         time.sleep(0.5) # Kiwoom API only allows up to 5 requests per second (0.2 but set 0.5)
 
@@ -215,3 +266,25 @@ class Kiwoom(QAxWidget):
         elif int(s_gubun) == 1:
             print("* 잔고 출력(self.balance)")
             print(self.balance)
+
+    def get_order(self):  # Check today order information
+        self.dynamicCall("SetInputValue(QString, QString)", "계좌번호", self.account_number)
+        self.dynamicCall("SetInputValue(QString, QString)", "전체종목구분", "0")
+        self.dynamicCall("SetInputValue(QString, QString)", "체결구분", "0")  # 0:All, 1:Unfinished, 2:Conclude
+        self.dynamicCall("SetInputValue(QString, QString)", "매매구분", "0")  # 0:All, 1:Sell, 2:Buy
+        self.dynamicCall("CommRqData(QString, QString, int, QString)", "opt10075_req", "opt10075", 0, "0002")
+
+        self.tr_event_loop.exec_()
+        return self.tr_data
+
+    """
+    1. Run program
+    2. Check today order information (confirm received order)
+    3. Receive order
+    4. Execute _on_chejan_slot function
+    5. Save order data
+    6. Program termination situation occurs
+    7. Rerun program
+    8. Order information inquiry
+    9. confirm order information and do not reorder
+    """
