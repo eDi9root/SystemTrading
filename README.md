@@ -35,6 +35,8 @@
     5. Sorting ROE and 1/PER in descending order, 
         extracting 200 companies by calculating the average of the two ranks
     ```
+- Backtesting
+
 
 ### How To Run
 
