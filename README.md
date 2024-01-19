@@ -5,11 +5,30 @@
 ### 1. Strategy
 - Counter-trend strategy based on `RSI`
 
-  ```
-  RSI = 100 * AU / (AU+AD)
-  RS = AU / AD
-  ```
-- Assuming `mean reversion` effect
+    ```
+    RSI = 100 * AU / (AU+AD)
+    RS = AU / AD
+    RSI Signal = moving average line of RSI
+  
+    # Assuming mean reversion effect
+    # Used RSI(2), judged based on the closing prices of the last two days for short term
+    # USed RSI Signal (20 or 60) for mid-term trend
+    ```
+- Conditions
+
+    ```python
+    if RSI_Signal(20) > RSI_Signal(60) and
+       RSI(2) < 5 and
+       Current stock price change rate compared to two days ago < -2%:
+       
+       Result = Buy at the current highest bid price
+  
+    if RSI(2) > 80 and
+       Current price > Buying Price:
+  
+       Result = Sell at the current best ask price
+
+    ```
 
 ### How To Run
 
