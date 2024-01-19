@@ -40,10 +40,10 @@
 
 ### How To Run
   ```
-  Development Tools: # PyCharm 2023.2.3  # Anaconda3
+  Development Tools:    # PyCharm 2023.2.3  # Anaconda3
   Programming Language: # Python
-  API: # Kiwoom Open API+
-  Database: # sqlite3
+  API:                  # Kiwoom Open API+
+  Database:             # sqlite3
   ```
 
 ### Continous Development
