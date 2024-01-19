@@ -39,4 +39,15 @@
 
 
 ### How To Run
+  ```
+  Development Tools: # PyCharm 2023.2.3  # Anaconda3
+  Programming Language: # Python
+  API: # Kiwoom Open API+
+  Database: # sqlite3
+  ```
+
+### Continous Development
+  ```
+  This project continues to progress and further implements the strategy.
+  ```
 
