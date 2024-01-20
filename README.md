@@ -46,6 +46,8 @@
   Database:             # sqlite3
   ```
 
+### Logical Structure (initialization phase)
+
 ### Continous Development
   ```
   This project continues to progress and further implements the strategy.
