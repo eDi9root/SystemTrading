@@ -47,6 +47,8 @@
   ```
 
 ### Logical Structure (initialization phase)
+<img src="https://github.com/eDi9root/SystemTrading/blob/main/Documents/Logical%20structure.png" 
+alt="Logical Structure" width=300>
 
 ### Continous Development
   ```
