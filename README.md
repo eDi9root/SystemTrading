@@ -60,10 +60,10 @@ alt="Logical Structure" width=300>
   ```
 
 ### Commit Rule
-- 메인 브랜치에 커밋하지 않는다
-- 브랜치 파서 커밋 후 기능개발이 완료되면 메인 브랜치에 풀리퀘스트 한다.
-- 브랜치 이름 규칙
-    - 개발하는 폴더/개발내용 (e.g. api/kiwoom, util/const)
-- 풀리퀘스트 작성 규칙 
-    - 제목: 개발한 내용 
-    - 내용: 개발한 내용에 대한 간략한 설명
+- Do not commit from/to the main branch
+- After committing the new branch, make a pull request to the main branch
+- Branch name rule:
+  - Development Dir/content (e.g. api/Kiwoom, Util/const)
+- Pull request writing rules
+  - Title: What was developed
+  - Content: Brief description of the developed content
