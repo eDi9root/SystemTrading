@@ -1,5 +1,9 @@
 # Python_project_SystemTrading with Bank API
 
+## git commit 규칙
+- main은 건들이지 않기
+- 각자 branch 생성해서 브랜치에서 개발하고 main에 pull request
+
 ## About
 
 ### 1. Strategy
