@@ -1,5 +1,5 @@
 
-from api.Kiwoom import *
+from api import *
 import sys
 
 app = QApplication(sys.argv)
