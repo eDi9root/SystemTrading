@@ -50,6 +50,10 @@
 <img src="https://github.com/eDi9root/SystemTrading/blob/main/Documents/Logical%20structure.png" 
 alt="Logical Structure" width=300>
 
+### Logical Structure (post)
+<img src="https://github.com/eDi9root/SystemTrading/blob/main/Documents/post%20logical%20structure.png" 
+alt="Logical Structure" width=300>
+
 ### Continous Development
   ```
   This project continues to progress and further implements the strategy.
