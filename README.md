@@ -43,7 +43,7 @@
   Development Tools:    # PyCharm 2023.2.3  # Anaconda3
   Programming Language: # Python
   API:                  # Kiwoom Open API+
-  Database:             # sqlite3
+  Database:             # Mysql
   ```
 
 ### Continous Development
