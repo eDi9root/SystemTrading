@@ -46,8 +46,24 @@
   Database:             # Mysql
   ```
 
+### Logical Structure (initialization phase)
+<img src="https://github.com/eDi9root/SystemTrading/blob/main/Documents/Logical%20structure.png" 
+alt="Logical Structure" width=300>
+
+### Logical Structure (post)
+<img src="https://github.com/eDi9root/SystemTrading/blob/main/Documents/post%20logical%20structure.png" 
+alt="Logical Structure" width=300>
+
 ### Continous Development
   ```
   This project continues to progress and further implements the strategy.
   ```
 
+### Commit Rule
+- Do not commit from/to the main branch
+- After committing the new branch, make a pull request to the main branch
+- Branch name rule:
+  - Development Dir/content (e.g. api/Kiwoom, Util/const)
+- Pull request writing rules
+  - Title: What was developed
+  - Content: Brief description of the developed content
