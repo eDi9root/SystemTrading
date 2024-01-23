@@ -43,7 +43,7 @@
   Development Tools:    # PyCharm 2023.2.3  # Anaconda3
   Programming Language: # Python
   API:                  # Kiwoom Open API+
-  Database:             # Mysql
+  Database:             # Mysql, SQLite
   ```
 
 ### Logical Structure (initialization phase)
@@ -67,3 +67,14 @@ alt="Logical Structure" width=300>
 - Pull request writing rules
   - Title: What was developed
   - Content: Brief description of the developed content
+
+### Used MySQL with Python
+  ```
+  1. 'Connecter' = pymysql.connect('connect options')
+  2. 'Cursor name' = 'Connecter'.cursor()
+  3. 'Cursor name'.execute("CREATE TABLE 'sentence'")
+  4. 'Cursor name'.execute("INSERT 'sentence'")
+  5. 'Connecter'.commit()
+  6. 'Connecter'.close()
+
+  ```
