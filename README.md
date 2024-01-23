@@ -76,5 +76,4 @@ alt="Logical Structure" width=300>
   4. 'Cursor name'.execute("INSERT 'sentence'")
   5. 'Connecter'.commit()
   6. 'Connecter'.close()
-
   ```
