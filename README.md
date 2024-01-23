@@ -43,7 +43,8 @@
   Development Tools:    # PyCharm 2023.2.3  # Anaconda3
   Programming Language: # Python
   API:                  # Kiwoom Open API+
-  Database:             # Mysql, SQLite
+  Database:             # Mysql
+  Crawling:             # bs4, lxml, openpyxl, numpy
   ```
 
 ### Logical Structure (initialization phase)
