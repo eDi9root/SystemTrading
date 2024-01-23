@@ -1,4 +1,4 @@
-from api.Kiwoom import *
+from kiwoom_api.Kiwoom import *
 import sys
 
 app = QApplication(sys.argv)
