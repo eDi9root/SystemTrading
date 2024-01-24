@@ -8,16 +8,20 @@ BASE_URL = 'https://finance.naver.com/sise/sise_market_sum.nhn?sosok='
 START_PAGE = 1
 fields = []
 
-CODES = [0, 1]
-# KOSPI:0, KOSDAQ:1
+CODES = [0, 1] # KOSPI:0, KOSDAQ:1
 
+
+# Extract total number of pages based on the tag 'last'
 res = requests.get(BASE_URL + str(CODES[0]))
 page_soup = BeautifulSoup(res.text,'lxml')
-# print(page_soup)
 
 total_page_num = page_soup.select_one('td.pgRR > a')
 total_page_num = int(total_page_num.get('href').split('=')[-1])
-print(total_page_num)
+
+# Extract searchable item names
+ipt_html = page_soup.select_one('div.subcnt_sise_item_top')
+fields = [item.get('value') for item in ipt_html.select('input')]
+print(fields)
 
 
 
