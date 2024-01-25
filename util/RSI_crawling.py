@@ -7,10 +7,11 @@ from datetime import datetime
 BASE_URL = 'https://finance.naver.com/sise/sise_market_sum.nhn?sosok='
 START_PAGE = 1
 fields = []
-CODES = [0, 1] # KOSPI:0, KOSDAQ:1
+CODES = [0, 1]  # KOSPI:0, KOSDAQ:1
 
 now = datetime.now()
 formattedDate = now.strftime("%Y%m%d")
+
 
 def execute_crawler():
     # Variable used to combine KOSPI, KOSDAQ into one
@@ -18,7 +19,6 @@ def execute_crawler():
 
     # KOSPI, KOSDAQ items in CODES
     for code in CODES:
-
         # Get the total number of pages
         res = requests.get(BASE_URL + str(CODES[0]))
         page_soup = BeautifulSoup(res.text, 'lxml')
@@ -56,7 +56,6 @@ def execute_crawler():
 
 
 def crawler(code, page):
-
     global fields
 
     # Setting the values to be delivered to Naver finance
@@ -93,10 +92,3 @@ def crawler(code, page):
     # Collect info obtained from one page and return it
     df = pd.DataFrame(data=number_data, columns=header_data)
     return df
-
-if __name__ == "__main__":
-    print('Start')
-    universe = get_universe()
-    print(universe)
-    print('End')
-
