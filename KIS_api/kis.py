@@ -111,8 +111,8 @@ class KIS():
     
 # test
 if __name__ == '__main__':
-    app_key =  'PSbkjKDEhiHIjkug5xgGBFhy4zyn3NCsyVcg' # your appkey
-    app_secret = 'pJb6H/7Ot5v0AnRjbpf+dRS89KKu+SsDAYuiyP5hn6ycPMXM7vNFQ24m7tKLHuy33CDtdl8KW0eZBei/4Jjwvao5AS18Q35s1oasbCwTw0QO6hRh2QCzFP2JjVrp0kNUB0qhikxPhiqk1flGMOR/120y2/Pusa5SPJkRoHELJQ2Hpg2PB6o=' # your appsecret
+    app_key =  None # your appkey
+    app_secret = None # your appsecret
     kis = KIS(app_key, app_secret)
 
     # test get_current_price
