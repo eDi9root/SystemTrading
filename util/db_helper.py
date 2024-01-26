@@ -1,10 +1,15 @@
 import pymysql
+from sqlalchemy import create_engine
+
+HOSTNAME = '127.0.0.1'
+USER = 'root'
+PASSWORD = 'systemtradingpy0'
 
 
 def check_table_exist(db_name, table_name):
-    conn = pymysql.connect(host='127.0.0.1', user='root',
-                           password='systemtradingpy0',
-                           db='{}'.format(db_name), charset='utf8')
+    conn = pymysql.connect(host=HOSTNAME, user=USER,
+                           password=PASSWORD,
+                           db=db_name, charset='utf8')
     cur = conn.cursor()
     check = "SHOW TABLES LIKE '{}'".format(table_name)
     cur.execute(check)
@@ -17,8 +22,14 @@ def check_table_exist(db_name, table_name):
         return False
 
 
+def insert_df_to_db(db_name, table_name, df, option="replace"):
 
-# conn.close()
+    db_connection_str = f'mysql+pymysql://{USER}:{PASSWORD}@{HOSTNAME}/{db_name}'
+    db_connection = create_engine(db_connection_str)
+    conn = db_connection
+    df.to_sql(table_name, conn, if_exists=option)
+
+
 
 """
 Data insert: INSERT
@@ -40,7 +51,5 @@ Data delete: DELETE
 cur.execute("DELETE FROM balance where will_clear_at ...")
 
 """
-
+# conn.close()
 # conn.commit()
-
-
