@@ -1,7 +1,6 @@
-from api.kiwoom_api.Kiwoom import *
+from api.Kiwoom import *
 from util.RSI_universe import *
 from util.db_helper import *
-import math
 
 
 class RSIStrategy(QThread):
@@ -51,6 +50,10 @@ class RSIStrategy(QThread):
             insert_df_to_db(self.strategy_name, 'universe', universe_df)
 
 
-
     def run(self):
         pass
+
+
+'''
+Need to make a function for check universe database is up-to-date for each month to update
+'''
