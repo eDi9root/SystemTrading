@@ -8,6 +8,8 @@ class RSIStrategy(QThread):
         QThread.__init__(self)
         self.strategy_name = "RSIStrategy"
         self.kiwoom = Kiwoom()
+        self.universe = {}
+
         self.init_strategy()
 
     def init_strategy(self):
@@ -49,6 +51,15 @@ class RSIStrategy(QThread):
             # Save in DB with table name 'universe'
             insert_df_to_db(self.strategy_name, 'universe', universe_df)
 
+        sql = "select * from universe"
+        cur = execute_sql(self.strategy_name, sql)
+        universe_list = cur.fetchall()
+        for item in universe_list:
+            idx, code, code_name, created_at = item
+            self.universe[code] = {
+                'code_name': code_name
+            }
+        print(self.universe)
 
     def run(self):
         pass
