@@ -1,10 +1,24 @@
 import pymysql
 
-conn = pymysql.connect(host='127.0.0.1', user='root',
-                       password='systemtradingpy0',
-                       db='universe_price', charset='utf8')
 
-cur = conn.cursor()
+def check_table_exist(db_name, table_name):
+    conn = pymysql.connect(host='127.0.0.1', user='root',
+                           password='systemtradingpy0',
+                           db='{}'.format(db_name), charset='utf8')
+    cur = conn.cursor()
+    check = "SHOW TABLES LIKE '{}'".format(table_name)
+    cur.execute(check)
+    print(check)
+    result = cur.fetchall()
+
+    if len(result) > 0:
+        return True
+    else:
+        return False
+
+
+
+# conn.close()
 
 """
 Data insert: INSERT
@@ -27,9 +41,6 @@ cur.execute("DELETE FROM balance where will_clear_at ...")
 
 """
 
+# conn.commit()
 
 
-
-conn.commit()
-
-conn.close()
