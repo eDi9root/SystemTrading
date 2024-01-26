@@ -1,4 +1,6 @@
 from util.RSI_crawling import *
+
+
 def get_universe():
     # Get crawling results
     df = execute_crawler()
