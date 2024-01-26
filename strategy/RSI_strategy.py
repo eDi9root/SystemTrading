@@ -1,4 +1,4 @@
-from kiwoom_api.Kiwoom import *
+from api.kiwoom_api.Kiwoom import *
 from util.RSI_universe import *
 from util.db_helper import *
 import math
