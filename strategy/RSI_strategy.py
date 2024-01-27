@@ -182,7 +182,7 @@ class RSIStrategy(QThread):
             except Exception as e:
                 print(traceback.format_exc())
                 # LINE
-                send_message(traceback.format_exc(), RSI_STRATEGY_MESSAGE_TOKEN)
+                # send_message(traceback.format_exc(), RSI_STRATEGY_MESSAGE_TOKEN)
 
     def check_sell_signal(self, code):
         """
@@ -190,7 +190,52 @@ class RSIStrategy(QThread):
         :param code:
         :return:
         """
+        universe_item = self.universe[code]
 
+        # 1. Check whether current transaction info exists
+        if code not in self.kiwoom.universe_realtime_transaction_info.keys():
+            # If there is no info, function ends
+            print("매도대상 확인 과정에서 아직 체결정보가 없습니다.")
+            return
+
+        # If exists, Store current market price/high price/low price/current price/cumulative volume
+        open = self.kiwoom.universe_realtime_transaction_info[code]['시가']
+        high = self.kiwoom.universe_realtime_transaction_info[code]['고가']
+        low = self.kiwoom.universe_realtime_transaction_info[code]['저가']
+        close = self.kiwoom.universe_realtime_transaction_info[code]['현재가']
+        volume = self.kiwoom.universe_realtime_transaction_info[code]['누적거래량']
+
+        # Create a list to add to DataFrame
+        today_price_data = [open, high, low, close, volume]
+
+        df = universe_item['price_df'].copy()
+
+        # Add today's date to price data
+        df.loc[datetime.now().strftime('%Y%m%d')] = today_price_data
+
+        # RSI(N) Calculation
+        period = 2  # Base date setting
+        date_index = df.index.astype('str')
+
+        U = np.where(df['close'].diff(1) > 0, df['close'].diff(1), 0)
+        D = np.where(df['close'].diff(1) < 0, df['close'].diff(1) * (-1), 0)
+
+        AU = pd.DataFrame(U, index=date_index).rolling(window=period).mean()
+        AD = pd.DataFrame(D, index=date_index).rolling(window=period).mean()
+
+        RSI = AU / (AD + AU) * 100
+        df['RSI(2)'] = RSI
+
+        # Check the purchase price of stocks
+        purchase_price = self.kiwoom.balance[code]['매입가']
+        # Find today's RSI(2)
+        rsi = df[-1:]['RSI(2)'].values[0]
+
+        # Selling conditions are met -> True
+        if rsi > 80 and close > purchase_price:
+            return True
+        else:
+            return False
 
 
     def order_sell(self, code):
@@ -199,6 +244,15 @@ class RSIStrategy(QThread):
         :param code:
         :return:
         """
+        quantity = self.kiwoom.balance[code]['보유수량']
+        ask = self.kiwoom.universe_realtime_transaction_info[code]['(최우선)매도호가']
+
+        order_result = self.kiwoom.send_order('send_sell_order', '1001', 2, code, quantity, ask, '00')
+
+        # LINE
+        # message = "[{}]sell order is done! quantity:{}, ask:{}, order_result:{}".format(code, quantity, ask,
+        #                                                                                order_result)
+        # send_message(message, RSI_STRATEGY_MESSAGE_TOKEN)
 
 
     def check_buy_signal_and_order(self, code):
@@ -207,6 +261,93 @@ class RSIStrategy(QThread):
         :param code:
         :return:
         """
+        if not check_adjacent_transaction_closed():
+            return False
+
+        universe_item = self.universe[code]
+
+        # Check whether current transaction info exists
+        if code not in self.kiwoom.universe_realtime_transaction_info.keys():
+            print("매수대상 확인 과정에서 아직 체결정보가 없습니다.")
+            return
+
+        open = self.kiwoom.universe_realtime_transaction_info[code]['시가']
+        high = self.kiwoom.universe_realtime_transaction_info[code]['고가']
+        low = self.kiwoom.universe_realtime_transaction_info[code]['저가']
+        close = self.kiwoom.universe_realtime_transaction_info[code]['현재가']
+        volume = self.kiwoom.universe_realtime_transaction_info[code]['누적거래량']
+
+        today_price_data = [open, high, low, close, volume]
+
+        df = universe_item['price_df'].copy()
+
+        df.loc[datetime.now().strftime('%Y%m%d')] = today_price_data
+
+        # RSI(N) Calculation
+        period = 2
+        date_index = df.index.astype('str')
+
+        U = np.where(df['close'].diff(1) > 0, df['close'].diff(1), 0)
+        D = np.where(df['close'].diff(1) < 0, df['close'].diff(1) * (-1), 0)
+        AU = pd.DataFrame(U, index=date_index).rolling(window=period).mean()
+        AD = pd.DataFrame(D, index=date_index).rolling(window=period).mean()
+
+        RSI = AU / (AD + AU) * 100
+        df['RSI(2)'] = RSI
+
+        # Calculate moving average based on closing price
+        df['ma20'] = df['close'].rolling(window=20, min_periods=1).mean()
+        df['ma60'] = df['close'].rolling(window=60, min_periods=1).mean()
+
+        rsi = df[-1:]['RSI(2)'].values[0]
+        ma20 = df[-1:]['ma20'].values[0]
+        ma60 = df[-1:]['ma60'].values[0]
+
+        idx = df.index.get_loc(datetime.now().strftime('%Y%m%d')) - 2
+
+        close_2days_ago = df.iloc[idx]['close']
+
+        price_diff = (close - close_2days_ago) / close_2days_ago * 100
+
+        # Confirm buy signal (Get order if conditions are met)
+        if ma20 > ma60 and rsi < 5 and price_diff < -2:
+            # If the total sum of the items already maximum number, then no more puchases
+            if (self.get_balance_count() + self.get_buy_order_count()) >= 10:
+                return
+
+            # Amount of money calculation
+            budget = self.deposit / (10 - (self.get_balance_count() + self.get_buy_order_count()))
+
+            bid = self.kiwoom.universe_realtime_transaction_info[code]['(최우선)매수호가']
+
+            # Order quantity calculation
+            quantity = math.floor(budget / bid)
+
+            if quantity < 1:
+                return
+
+            # Fee calculation
+            amount = quantity * bid
+            self.deposit = math.floor(self.deposit - amount * 1.00035)
+            # 1.00015 -> real, 1.00035 -> virtual
+
+            if self.deposit < 0:
+                return
+
+            order_result = self.kiwoom.send_order('send_buy_order', '1001', 1, code, quantity, bid, '00')
+
+            self.kiwoom.order[code] = {'주문구분': '매수', '미체결수량': quantity}
+
+            # LINE
+            """
+            message = "[{}]buy order is done! quantity:{}, bid:{}, order_result:{}, deposit:{}, get_balance_count:{}, get_buy_order_count:{}, balance_len:{}".format(
+                code, quantity, bid, order_result, self.deposit, self.get_balance_count(), self.get_buy_order_count(),
+                len(self.kiwoom.balance))
+            send_message(message, RSI_STRATEGY_MESSAGE_TOKEN)
+            """
+
+        else:
+            return
 
 
     def get_balance_count(self):
@@ -214,12 +355,22 @@ class RSIStrategy(QThread):
         Calculate the number of stocks held for which no sell order has been received
         :return:
         """
+        balance_count = len(self.kiwoom.balance)
+        for code in self.kiwoom.order.keys():
+            if code in self.kiwoom.balance and self.kiwoom.order[code]['주문구분'] == "매도" and self.kiwoom.order[code]['미체결수량'] == 0:
+                balance_count = balance_count - 1
+        return balance_count
 
     def get_buy_order_count(self):
         """
         Calculate the number of stocks buy order
         :return:
         """
+        buy_order_count = 0
+        for code in self.kiwoom.order.keys():
+            if code not in self.kiwoom.balance and self.kiwoom.order[code]['주문구분'] == "매수":
+                buy_order_count = buy_order_count + 1
+        return buy_order_count
 
 '''
 Need to make a function for check universe database is up-to-date for each month to update
