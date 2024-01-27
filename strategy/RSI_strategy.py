@@ -146,7 +146,9 @@ class RSIStrategy(QThread):
         self.kiwoom.set_real_reg("9999", codes, fids, "0")
 
     def run(self):
-        pass
+        while True:
+            print("Continue")
+            time.sleep(0.5)
 
 
 '''
