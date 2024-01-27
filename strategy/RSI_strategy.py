@@ -3,6 +3,7 @@ from util.RSI_universe import *
 from util.db_helper import *
 from util.time_helper import *
 import math
+import traceback
 
 
 class RSIStrategy(QThread):
@@ -10,7 +11,10 @@ class RSIStrategy(QThread):
         QThread.__init__(self)
         self.strategy_name = "RSIStrategy"
         self.kiwoom = Kiwoom()
+
         self.universe = {}
+        self.deposit = 0
+        self.is_init_success = False
 
         self.init_strategy()
 
@@ -18,8 +22,18 @@ class RSIStrategy(QThread):
         """
         Performs strategy initialization function
         """
-        self.check_and_get_universe()
-        self.check_and_get_price_data()
+        try:
+            self.check_and_get_universe()
+            self.check_and_get_price_data()
+            self.kiwoom.get_order()
+            self.kiwoom.get_balance()
+            self.deposit = self.kiwoom.get_deposit()
+            self.set_universe_real_time()
+
+            self.is_init_success = True
+
+        except Exception as e:
+            print(traceback.format_exc())
 
     def check_and_get_universe(self):
         """
@@ -110,6 +124,27 @@ class RSIStrategy(QThread):
                     price_df = price_df.set_index('index')
                     # store price data to self.universe to access
                     self.universe[code]['price_df'] = price_df
+
+    def set_universe_real_time(self):
+        """
+        Register to receive universe real-time trading information
+        :return:
+        """
+        # Pass one random fid (must pass at least one fid of any value)
+        fids = get_fid("체결시간")
+
+        # Use if want to check market operation classification
+        # self.kiwoom.set_real_reg("1000", "", get_fid("장운영구분"), "0")
+
+        # key values mean stock codes
+        codes = self.universe.keys()
+
+        # grouping stock codes based on ';'
+        codes = ";".join(map(str, codes))
+
+        # Request to receive real-time trading information
+        self.kiwoom.set_real_reg("9999", codes, fids, "0")
+
     def run(self):
         pass
 
