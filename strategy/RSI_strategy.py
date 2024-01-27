@@ -144,9 +144,41 @@ class RSIStrategy(QThread):
         self.kiwoom.set_real_reg("9999", codes, fids, "0")
 
     def run(self):
-        while True:
-            print("Continue")
-            time.sleep(0.5)
+        """
+        Run a practical role
+        :return:
+        """
+        while self.is_init_success:
+            try:
+                # Check if the market is opened
+                if not check_transaction_open():
+                    print("장시간이 아니므로 5분간 대기합니다.")
+                    time.sleep(5 * 60)
+                    continue
+
+                for idx, code in enumerate(self.universe.keys()):
+                    print('[{}/{}_{}]'.format(idx + 1, len(self.universe), self.universe[code]['code_name']))
+                    time.sleep(0.5)
+
+                    # Check whether any orders have been received
+                    if code in self.kiwoom.order.keys():
+                        # There is an order
+                        print('접수 주문', self.kiwoom.order[code])
+
+                        # Check the 'untraded quantity'
+                        if self.kiwoom.order[code]['미체결수량'] > 0:
+                            pass
+
+                    # Check whether it is an item you own
+                    elif code in self.kiwoom.balance.keys():
+                        print('보유 종목', self.kiwoom.balance[code])
+                        # Check of sale target
+                        if self.check_sell_signal(code):
+                            self.order_sell(code)
+
+                    else:
+                        # Whether it is a purchase target and then submit the order
+                        self.check_buy_signal_and_order(code)
 
 
 '''
