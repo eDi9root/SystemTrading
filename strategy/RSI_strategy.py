@@ -215,6 +215,12 @@ class RSIStrategy(QThread):
         :return:
         """
 
+    def get_buy_order_count(self):
+        """
+        Calculate the number of stocks buy order
+        :return:
+        """
+
 '''
 Need to make a function for check universe database is up-to-date for each month to update
 '''
