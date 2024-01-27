@@ -208,6 +208,13 @@ class RSIStrategy(QThread):
         :return:
         """
 
+
+    def get_balance_count(self):
+        """
+        Calculate the number of stocks held for which no sell order has been received
+        :return:
+        """
+
 '''
 Need to make a function for check universe database is up-to-date for each month to update
 '''
