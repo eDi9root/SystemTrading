@@ -21,7 +21,6 @@ class RSIStrategy(QThread):
         self.check_and_get_universe()
         self.check_and_get_price_data()
 
-class CheckData(RSIStrategy):
     def check_and_get_universe(self):
         """
         Check if the universe exists and create it
