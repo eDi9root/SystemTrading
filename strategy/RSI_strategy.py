@@ -179,7 +179,34 @@ class RSIStrategy(QThread):
                     else:
                         # Whether it is a purchase target and then submit the order
                         self.check_buy_signal_and_order(code)
+            except Exception as e:
+                print(traceback.format_exc())
+                # LINE
+                send_message(traceback.format_exc(), RSI_STRATEGY_MESSAGE_TOKEN)
 
+    def check_sell_signal(self, code):
+        """
+        Check sell signal
+        :param code:
+        :return:
+        """
+
+
+
+    def order_sell(self, code):
+        """
+        Sell order reception
+        :param code:
+        :return:
+        """
+
+
+    def check_buy_signal_and_order(self, code):
+        """
+        Checks whether the purchase target is available and accepts the order
+        :param code:
+        :return:
+        """
 
 '''
 Need to make a function for check universe database is up-to-date for each month to update
