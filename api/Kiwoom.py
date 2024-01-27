@@ -121,7 +121,7 @@ class Kiwoom(QAxWidget):
 
     def _on_receive_tr_data(self, screen_no, rqname, trcode, record_name, next, unused1, unused2, unused3, unused4):
         # Print what response of TR
-        print("[Kiwoom] _on_receive_tr_data is called {} / {} / {}".format(screen_no, rqname, trcode))
+        # print("[Kiwoom] _on_receive_tr_data is called {} / {} / {}".format(screen_no, rqname, trcode))
         # Get number of response of this request
         tr_data_cnt = self.dynamicCall("GetRepeatCnt(QString, QString)", trcode, rqname)
 

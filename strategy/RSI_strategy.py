@@ -89,7 +89,6 @@ class RSIStrategy(QThread):
             # Case 1: Whether there is any daily data (after market close)
             if check_transaction_closed() and not check_table_exist(self.strategy_name, code):
                 # Save price data using API
-                print(3)
                 price_df = self.kiwoom.get_price_data(code)
                 # Save to the database (code -> table name)
                 insert_df_to_db(self.strategy_name, code, price_df)
@@ -97,7 +96,6 @@ class RSIStrategy(QThread):
                 # Case 2, 3 ,4: Now we have daily data
                 # Case 2: The stock market is closed, then save the data obtained by API
                 if check_transaction_closed():
-                    print(4)
                     # Check the most recent date of saved data
                     sql = "select max(`{}`) from `{}`".format('index', code)
                     cur = execute_sql(self.strategy_name, sql)
