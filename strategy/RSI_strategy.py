@@ -1,6 +1,8 @@
 from api.Kiwoom import *
 from util.RSI_universe import *
 from util.db_helper import *
+from util.time_helper import *
+import math
 
 
 class RSIStrategy(QThread):
@@ -17,6 +19,7 @@ class RSIStrategy(QThread):
         Performs strategy initialization function
         """
         self.check_and_get_universe()
+        self.check_and_get_price_data()
 
     def check_and_get_universe(self):
         """
@@ -61,6 +64,50 @@ class RSIStrategy(QThread):
             }
         print(self.universe)
 
+    def check_and_get_price_data(self):
+        """
+        Check if candle data exists and create it
+        :return:
+        """
+        for idx, code in enumerate(self.universe.keys()):
+            print("({}/{}) {}".format(idx + 1, len(self.universe), code))
+
+            # Case 1: Whether there is any daily data (after market close)
+            if check_transaction_closed() and not check_table_exist(self.strategy_name, code):
+                # Save price data using API
+                price_df = self.kiwoom.get_price_data(code)
+                # Save to the database (code -> table name)
+                insert_df_to_db(self.strategy_name, code, price_df)
+            else:
+                # Case 2, 3 ,4: Now we have daily data
+                # Case 2: The stock market is closed, then save the data obtained by API
+                if check_transaction_closed():
+                    # Check the most recent date of saved data
+                    sql = "select max(`{}`) from `{}`".format('index', code)
+                    cur = execute_sql(self.strategy_name, sql)
+                    last_date = cur.fetchone()
+
+                    now = datetime.now().strftime("%Y%m%d")
+
+                    # Check if the most recent save date is today
+                    if last_date[0] != now:
+                        price_df = self.kiwoom.get_price_data(code)
+                        # Save to the database (code -> table name)
+                        insert_df_to_db(self.strategy_name, code, price_df)
+
+                # Case 3, 4: Extract data stored in the database before or during the market
+                # But, candle data extracted is data from the previous day, excluding today
+                else:
+                    sql = "select * from `{}`".format(code)
+                    cur = execute_sql(self.strategy_name, sql)
+                    # ['index', 'open', 'high', 'low', 'close', 'volume']
+                    cols = [column[0] for column in cur.description]
+
+                    # Convert data from database into DataFrame
+                    price_df = pd.DataFrame.from_records(data=cur.fetchall(), columns=cols)
+                    price_df = price_df.set_index('index')
+                    # store price data to self.universe to access
+                    self.universe[code]['price_df'] = price_df
     def run(self):
         pass
 
