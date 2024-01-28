@@ -66,13 +66,13 @@ class RSIStrategy(QThread):
             })
 
             # Save in DB with table name 'universe'
-            insert_df_to_db(self.strategy_name, 'universe', universe_df)
+            insert_df_to_db(self.strategy_name, 'universe', universe_df, False)
 
         sql = "select * from universe"
         cur = execute_sql(self.strategy_name, sql)
         universe_list = cur.fetchall()
         for item in universe_list:
-            idx, code, code_name, created_at = item
+            code, code_name, created_at = item
             self.universe[code] = {
                 'code_name': code_name
             }
@@ -90,8 +90,10 @@ class RSIStrategy(QThread):
             if check_transaction_closed() and not check_table_exist(self.strategy_name, code):
                 # Save price data using API
                 price_df = self.kiwoom.get_price_data(code)
+                print(price_df)
                 # Save to the database (code -> table name)
-                insert_df_to_db(self.strategy_name, code, price_df)
+                insert_df_to_db(self.strategy_name, code, price_df, True)
+
             else:
                 # Case 2, 3 ,4: Now we have daily data
                 # Case 2: The stock market is closed, then save the data obtained by API

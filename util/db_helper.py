@@ -15,18 +15,18 @@ def check_table_exist(db_name, table_name):
     cur.execute(check)
     result = cur.fetchall()
 
-    print(len(result))
+    # print(len(result))
     if len(result) > 0:
         return True
     else:
         return False
 
 
-def insert_df_to_db(db_name, table_name, df, option="replace"):
+def insert_df_to_db(db_name, table_name, df, index, option="replace"):
     db_connection_str = f'mysql+pymysql://{USER}:{PASSWORD}@{HOSTNAME}/{db_name}'
     db_connection = create_engine(db_connection_str)
     conn = db_connection
-    df.to_sql(table_name, conn, if_exists=option)
+    df.to_sql(table_name, conn, index=index, if_exists=option)
 
 
 def execute_sql(db_name, sql, param={}):
